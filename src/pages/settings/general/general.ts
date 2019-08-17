@@ -10,8 +10,9 @@ import { Config } from '../../../providers/index';
     templateUrl : 'general.html'
 })
 export class GeneralPage {
-    
-    selectedUnit: string = 'mBTC';
+
+    selectedBitcoinUnit: string = 'mBTC';
+    selectedEthereumUnit: string = 'Wei';
     selectedExplorer: string = 'blockchaininfo';
     paymentRequestLabel: string = "";
 
@@ -21,16 +22,19 @@ export class GeneralPage {
     ionViewWillEnter() {
         Promise.all<string>([
             this.config.get(Config.CONFIG_KEY_BITCOIN_UNIT) ,
-            this.config.get(Config.CONFIG_KEY_PAYMENT_REQUEST_LABEL)
+            this.config.get(Config.CONFIG_KEY_PAYMENT_REQUEST_LABEL) ,
+            this.config.get(Config.CONFIG_KEY_ETHEREUM_UNIT) ,
         ]).then(promised => {
-            this.selectedUnit = promised[0];
+            this.selectedBitcoinUnit = promised[0];
             this.paymentRequestLabel = promised[1];
+            this.selectedEthereumUnit = promised[2];
         });
     }
 
     ionViewWillLeave() {
-        this.config.set(Config.CONFIG_KEY_BITCOIN_UNIT, this.selectedUnit);
+        this.config.set(Config.CONFIG_KEY_BITCOIN_UNIT, this.selectedBitcoinUnit);
+        this.config.set(Config.CONFIG_KEY_ETHEREUM_UNIT, this.selectedEthereumUnit);
         this.config.set(Config.CONFIG_KEY_PAYMENT_REQUEST_LABEL, this.paymentRequestLabel);
-    } 
-        
+    }
+
 }

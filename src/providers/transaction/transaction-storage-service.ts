@@ -52,7 +52,7 @@ export class TransactionStorageService {
         return new Promise((resolve, reject) => {
             let query = {
                 selector : selector,
-                sort : [{ timestamp : 'desc' }]                
+                sort : [{ timestamp : 'desc' }]
             };
 
             if (limit) {

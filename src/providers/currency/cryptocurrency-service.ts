@@ -6,10 +6,14 @@ import * as bitcoin from 'bitcoinjs-lib';
 export const BITCOIN = "bitcoin";
 export const TESTNET = "testnet";
 
+export const ETHEREUM = "ethereum";
+
 export const BITCOIN_ADDRESS  = "bitcoin-static-address";
 export const BITCOIN_XPUB_KEY = "bitcoin-xpub-key";
 export const TESTNET_ADDRESS  = "testnet-static-address";
 export const TESTNET_TPUB_KEY = "testnet-tpub-key";
+
+export const ETHEREUM_ADDRESS  = "ethereum-static-address";
 
 export const REGEX_BITCOIN_ADDRESS = new RegExp("^(" + regex['bitcoin-address'] + ")$");
 export const REGEX_BITCOIN_URI     = new RegExp("^" + regex['bitcoin-uri']);
@@ -17,6 +21,8 @@ export const REGEX_XPUB_KEY        = new RegExp("^(" + regex['bitcoin-xpub-key']
 export const REGEX_TESTNET_ADDRESS = new RegExp("^(" + regex['testnet-address'] + ")$");
 export const REGEX_TESTNET_URI     = new RegExp("^" + regex['testnet-uri']);
 export const REGEX_TPUB_KEY        = new RegExp("^(" + regex['testnet-tpub-key'] + ")$");
+
+export const REGEX_ETHEREUM_ADDRESS = new RegExp("^0x[a-fA-F0-9]{40}$");
 
 @Injectable()
 export class CryptocurrencyService {
@@ -33,7 +39,7 @@ export class CryptocurrencyService {
             }
         } catch (e) {
             throw new Error('Could not derive index from key' + e);
-        }        
+        }
     }
 
     getDerivationPath(index:number = 0, change:boolean = false) {
@@ -50,7 +56,7 @@ export class CryptocurrencyService {
                         currency : BITCOIN ,
                         data : input.match(REGEX_XPUB_KEY)[1]
                     };
-                }                
+                }
             }
             if (REGEX_TPUB_KEY.test(input)) {
                 input = input.match(REGEX_TPUB_KEY)[2];
@@ -60,9 +66,9 @@ export class CryptocurrencyService {
                         currency : TESTNET ,
                         data : input.match(REGEX_TPUB_KEY)[1]
                     }
-                }                
+                }
             }
-        } catch(e) {            
+        } catch(e) {
             console.error("error", e);
         }
 
@@ -70,13 +76,25 @@ export class CryptocurrencyService {
     }
 
     parseAddressInput(input: string) {
-        let addressRegexs = [REGEX_BITCOIN_ADDRESS, REGEX_BITCOIN_URI, REGEX_TESTNET_ADDRESS, REGEX_TESTNET_URI];
-        for(let i = 0; i < addressRegexs.length; i++) {
-            if (addressRegexs[i].test(input)) {
+        let bitcoinRegexs = [REGEX_BITCOIN_ADDRESS, REGEX_BITCOIN_URI, REGEX_TESTNET_ADDRESS, REGEX_TESTNET_URI];
+        for(let i = 0; i < bitcoinRegexs.length; i++) {
+            if (bitcoinRegexs[i].test(input)) {
                 return {
                     type : i > 1 ? TESTNET_ADDRESS : BITCOIN_ADDRESS ,
                     currency : i > 1 ? TESTNET : BITCOIN ,
-                    data : input.match(addressRegexs[i])[1]
+                    data : input.match(bitcoinRegexs[i])[1]
+                };
+            }
+        }
+
+        let ethereumRegexs = [REGEX_ETHEREUM_ADDRESS];
+        for(let i = 0; i < ethereumRegexs.length; i++) {
+            if (ethereumRegexs[i].test(input)) {
+
+                return {
+                    type : ETHEREUM_ADDRESS,
+                    currency : ETHEREUM,
+                    data : input.match(ethereumRegexs[i])[0]
                 };
             }
         }
@@ -85,11 +103,11 @@ export class CryptocurrencyService {
 
     /**
      * Parses account input information
-     * 
+     *
      * @param input account information
      * @return Account
      * @throws Error
-     * 
+     *
      */
     parseInput(input:string) {
        input = input.trim();

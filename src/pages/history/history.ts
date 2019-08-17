@@ -1,32 +1,34 @@
 import { Component } from '@angular/core';
 import { Account } from './../../api/account';
-import { BitcoinUnit, TransactionStorageService, CurrencyService, Config, AccountSyncService, AccountService } from './../../providers/index';
+import { BitcoinUnit, EthereumUnit, TransactionStorageService, CurrencyService, Config, AccountSyncService, AccountService } from './../../providers/index';
 import { NavController, LoadingController, NavParams, IonicPage, ModalController, AlertController } from 'ionic-angular';
 import { Transaction } from '../../api/transaction';
 import { File } from '@ionic-native/file';
 import { FileOpener } from '@ionic-native/file-opener';
 import { TranslateService } from '@ngx-translate/core'
 import 'rxjs/add/operator/toPromise';
+import { ETHEREUM_ADDRESS } from './../../providers/index.ts'
 
 @IonicPage({
     name : 'history' ,
-    segment : 'history/:accountId' ,
+    segment : 'history/:type/:accountId' ,
     defaultHistory: ['account']
 })
 @Component({
     templateUrl : 'history.html'
 })
 export class HistoryPage {
-    
+
     moreContentAvailable: boolean = true;
 
     accountId:string = "";
+    type:string = "";
     account:Account = null;
     transactions: Array<Transaction> = [];
 
     currencyThousandsPoint: string = "";
     currencySeparator: string = "";
-    currencyPrecision: number = 2;   
+    currencyPrecision: number = 2;
     currencySymbol:string = "BTC";
     dateTimeFormat: any;
     loaderText:string = "";
@@ -35,7 +37,7 @@ export class HistoryPage {
     referenceCurrencyRate:number = 0;
 
     loader:any;
-    
+
     constructor(
         protected navParams: NavParams,
         protected config: Config,
@@ -49,31 +51,38 @@ export class HistoryPage {
         protected nav: NavController,
         protected modalController: ModalController,
         protected alertController: AlertController,
-        protected translation: TranslateService) {    
-            this.accountId = this.navParams.get('accountId');        
+        protected translation: TranslateService) {
+          this.accountId = this.navParams.get('accountId');
+          this.type = this.navParams.get('type');
         }
 
     ionViewWillEnter() {
+        let isEthereum = false;
+        if(this.type == ETHEREUM_ADDRESS) {
+          isEthereum = true;
+        }
+
         Promise.all<any>([
             this.translation.get('FORMAT.CURRENCY_T').toPromise() ,
             this.translation.get('FORMAT.CURRENCY_S').toPromise() ,
             this.translation.get('FORMAT.DATETIME').toPromise() ,
             this.translation.get('TEXT.LOADING_TRANSACTIONS').toPromise() ,
-            this.config.get(Config.CONFIG_KEY_BITCOIN_UNIT) ,
+            isEthereum ? this.config.get(Config.CONFIG_KEY_ETHEREUM_UNIT) : this.config.get(Config.CONFIG_KEY_BITCOIN_UNIT) ,
             this.currencyService.getSelectedCurrency() ,
-            this.currencyService.getSelectedCurrencyRate() ,
+            isEthereum ? this.currencyService.getSelectedEthereumCurrencyRate() : this.currencyService.getSelectedBitcoinCurrencyRate() ,
             this.accountService.getAccount(this.accountId)
-        ]).then(promised => {           
+        ]).then(promised => {
             this.currencyThousandsPoint = promised[0];
             this.currencySeparator = promised[1];
             this.dateTimeFormat = promised[2];
             this.loaderText = promised[3];
             this.currencySymbol = promised[4];
-            this.currencyPrecision = BitcoinUnit.decimalsCount(promised[4]);
+            this.currencyPrecision = isEthereum ? EthereumUnit.decimalsCount(promised[4]) : BitcoinUnit.decimalsCount(promised[4]);
             this.referenceCurrencySymbol = promised[5];
+            console.log(promised[6])
             this.referenceCurrencyRate = promised[6];
             this.account = promised[7];
-            
+
             this.presentLoader();
             return this.accountSyncService.syncAccount(this.account);
         }).then(() => {
@@ -107,10 +116,10 @@ export class HistoryPage {
         } else {
             this.moreContentAvailable = true;
         }
-        
+
         for(let t of transactions) {
             this.transactions.push(t);
-        }        
+        }
 
         return this.moreContentAvailable;
     }
@@ -126,7 +135,7 @@ export class HistoryPage {
             window.open('https://live.blockcypher.com/btc-testnet/tx/' + txid, '_system');
         } else {
             window.open('https://blockchain.info/tx/' + txid, '_system');
-        }        
+        }
     }
 
     findTransactions() {
@@ -155,7 +164,7 @@ export class HistoryPage {
                     resolve();
                 }
             });
-        });        
+        });
     }
 
     openExport() {
@@ -163,5 +172,5 @@ export class HistoryPage {
             accountId : this.accountId
         }).present();
     }
-    
+
 }

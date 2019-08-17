@@ -4,7 +4,8 @@ import { BITCOIN, BitcoinUnit } from './../../index';
 import { HttpClient } from '@angular/common/http';
 import { Transaction } from './../../../api/transaction';
 
-const BLOCKCHAIN_INFO_BASE_URL = "https://blockchain.info/";
+const BITCOIN_INFO_BASE_URL = "https://blockchain.info/";
+const ETHEREUM_INFO_BASE_URL = "https://blockchain.info/";
 
 export class BlockchainInfoService implements TransactionService {
 
@@ -25,17 +26,17 @@ export class BlockchainInfoService implements TransactionService {
                             resolve(this.parseTransactions(filter.addresses, response));
                         }, () => { reject(); })
                 })
-        });       
+        });
     }
 
     getBlockHeight() : Promise<number> {
         return new Promise<number> ((resolve, reject) => {
-            this.http.get(BLOCKCHAIN_INFO_BASE_URL + 'q/getblockcount?cors=true')
-                .subscribe((response:any) => {                    
+            this.http.get(BITCOIN_INFO_BASE_URL + 'q/getblockcount?cors=true')
+                .subscribe((response:any) => {
                     if (response) {
                         this.lastKnownBlockchainHeight = response;
-                    }     
-                    resolve(this.lastKnownBlockchainHeight);              
+                    }
+                    resolve(this.lastKnownBlockchainHeight);
                 }, () => { resolve(this.lastKnownBlockchainHeight); });
         });
     }
@@ -43,12 +44,12 @@ export class BlockchainInfoService implements TransactionService {
     parseTransactions(addresses:string[], json:any) {
         let txs:Transaction[] = [];
         let items = [];
-        
+
         if (json && json.txs && Array.isArray(json.txs)) {
             items = json.txs;
         } else if (json && json.inputs && json.out) {
             items = [json];
-        }       
+        }
 
         for (let item of items) {
             let tx:any = this.parseTransactionInputs(addresses, item.inputs);
@@ -108,9 +109,9 @@ export class BlockchainInfoService implements TransactionService {
         let url = "";
 
         if (filter.txid) {
-            url = BLOCKCHAIN_INFO_BASE_URL + "rawtx/" + filter.txid + "?";
-        } else if (filter.addresses && filter.addresses.length > 0) {          
-            url = BLOCKCHAIN_INFO_BASE_URL + "multiaddr?active=" + filter.addresses.join('|') + "&";
+            url = BITCOIN_INFO_BASE_URL + "rawtx/" + filter.txid + "?";
+        } else if (filter.addresses && filter.addresses.length > 0) {
+            url = BITCOIN_INFO_BASE_URL + "multiaddr?active=" + filter.addresses.join('|') + "&";
         }
 
         if (filter.from >= 0 && filter.to > 0) {

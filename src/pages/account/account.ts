@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { Config, AccountService } from './../../providers/index';
 
 @IonicPage({
-    name : 'account' ,    
+    name : 'account' ,
     defaultHistory: ['amount']
 })
 @Component({
@@ -28,7 +28,7 @@ export class AccountPage {
     }
 
     openAccountHistory(i:number) {
-        this.navController.push('history', { accountId : this.accounts[i]._id });
+        this.navController.push('history', { type: this.accounts[i].type, accountId : this.accounts[i]._id });
     }
 
     ionViewWillEnter() {
@@ -42,13 +42,16 @@ export class AccountPage {
                 if (/bitcoin/.test(account.type)) {
                     account['icon'] = 'bitcoin';
                 }
+                if (/ethereum/.test(account.type)) {
+                    account['icon'] = 'ethereum';
+                }
                 if (/testnet/.test(account.type)) {
                     account['icon'] = 'testnet';
                 }
                 this.defaultAccount = promised[1];
                 this.accounts.push(account);
             }
-        });       
+        });
     }
 
 }

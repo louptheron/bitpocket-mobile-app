@@ -38,7 +38,8 @@ import {
   provideRepository,
   provideConfig,
   provideQRScanner,
-  provideBitcoinAverageExchangeService
+  provideBitcoinAverageExchangeService,
+  provideEthereumAverageExchangeService
 } from '../providers/index';
 
 // Ionic Native
@@ -54,6 +55,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 // Exchange Services
 import { BitcoinAverageExchangeService } from '../providers/currency/bitcoinaverage-service';
+import { EthereumAverageExchangeService } from '../providers/currency/ethereumaverage-service';
 
 // Pipes
 import { BitpocketCurrencyPipe } from '../pipes/currency';
@@ -66,12 +68,12 @@ export function createTranslateLoader(http: HttpClient) {
 
 @NgModule({
   declarations: [
-    BitPocketApp    
+    BitPocketApp
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
-    IonicModule.forRoot(BitPocketApp) ,    
+    IonicModule.forRoot(BitPocketApp) ,
     IonicStorageModule.forRoot(),
     TranslateModule.forRoot({
       loader : {
@@ -87,17 +89,18 @@ export function createTranslateLoader(http: HttpClient) {
   ],
   providers: [
     { provide: ErrorHandler, useClass: IonicErrorHandler } ,
-    { provide: CurrencyService, useFactory: provideCurrencyService, deps: [Config, BitcoinAverageExchangeService] } ,
+    { provide: CurrencyService, useFactory: provideCurrencyService, deps: [Config, BitcoinAverageExchangeService, EthereumAverageExchangeService] } ,
     { provide: AccountService, useFactory: provideAccountService, deps: [CryptocurrencyService, Config, Repository] } ,
     { provide: AccountSyncService, useFactory: provideAccountSyncService, deps: [TransactionServiceWrapper, TransactionStorageService, AccountService, CryptocurrencyService] } ,
     { provide: TransactionServiceWrapper, useFactory: provideTransactionService, deps: [HttpClient, CryptocurrencyService] } ,
     { provide: TransactionStorageService, useFactory: provideTransactionStorageService, deps: [Repository] } ,
     { provide: PaymentService, useFactory: providePaymentService, deps: [TransactionServiceWrapper, CryptocurrencyService] } ,
-    { provide: CryptocurrencyService, useFactory: provideCryptocurrencyService } ,  
+    { provide: CryptocurrencyService, useFactory: provideCryptocurrencyService } ,
     { provide: Repository, useFactory:provideRepository } ,
     { provide:Config, useFactory:provideConfig, deps:[Storage] } ,
     { provide:QRScanner, useFactory:provideQRScanner, deps:[ModalController] },
     { provide:BitcoinAverageExchangeService, useFactory:provideBitcoinAverageExchangeService, deps:[HttpClient, Config] },
+    { provide:EthereumAverageExchangeService, useFactory:provideEthereumAverageExchangeService, deps:[HttpClient, Config] },
     SplashScreen,
     Network,
     StatusBar,

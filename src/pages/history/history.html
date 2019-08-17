@@ -1,8 +1,8 @@
 <ion-header>
-    <ion-navbar>    
+    <ion-navbar>
         <button ion-button menuToggle="left"><ion-icon name="menu"></ion-icon></button>
-        <ion-title>{{ 'TITLE.HISTORY' | translate }}</ion-title>        
-        <bitpocket-logo></bitpocket-logo>        
+        <ion-title>{{ 'TITLE.HISTORY' | translate }}</ion-title>
+        <bitpocket-logo></bitpocket-logo>
     </ion-navbar>
 </ion-header>
 <ion-content class="history">
@@ -11,16 +11,17 @@
             <ion-item>
                 <ion-icon item-left *ngIf="transaction.incomming" name="ios-download-outline"></ion-icon>
                 <ion-icon item-left *ngIf="!transaction.incomming" name="ios-share-outline"></ion-icon>
-                <h2>{{ currencySymbol }} {{ transaction.amount | bitpocketUnit:'BTC':currencySymbol | bitpocketCurrency:currencySeparator:currencyThousandsPoint:currencyPrecision }} <span>({{ referenceCurrencySymbol }} {{ transaction.amount | bitpocketFiat:'BTC':referenceCurrencyRate | bitpocketCurrency:currencySeparator:currencyThousandsPoint }})</span></h2>     
-                <p><ion-icon [class.icon-unconfirmed]="transaction.confirmations < 6" [class.icon-confirmed]="transaction.confirmations >= 6" name="checkmark-circle"></ion-icon> {{ (transaction.timestamp * 1000) | date:dateTimeFormat }}</p>           
+                <h2 *ngIf="transaction.currency === 'BTC'">{{ currencySymbol }} {{ transaction.amount | bitpocketUnit:'BTC':currencySymbol | bitpocketCurrency:currencySeparator:currencyThousandsPoint:currencyPrecision }} <span>({{ referenceCurrencySymbol }} {{ transaction.amount | bitcoinFiat:'BTC':referenceCurrencyRate | bitpocketCurrency:currencySeparator:currencyThousandsPoint }})</span></h2>
+                <h2 *ngIf="transaction.currency === 'ETH'">{{ currencySymbol }} {{ transaction.amount | bitpocketUnit:'Wei':currencySymbol | bitpocketCurrency:currencySeparator:currencyThousandsPoint:currencyPrecision }} <span>({{ referenceCurrencySymbol }} {{ transaction.amount | ethereumFiat:'Wei':referenceCurrencyRate | bitpocketCurrency:currencySeparator:currencyThousandsPoint }})</span></h2>
+                <p><ion-icon [class.icon-unconfirmed]="transaction.confirmations < 6" [class.icon-confirmed]="transaction.confirmations >= 6" name="checkmark-circle"></ion-icon> {{ (transaction.timestamp * 1000) | date:dateTimeFormat }}</p>
             </ion-item>
             <ion-item-options>
                 <button ion-button  (click)="openTransaction(transaction._id)">
-                    <ion-icon name="link"></ion-icon> Link                    
+                    <ion-icon name="link"></ion-icon> Link
                 </button>
                 <button ion-button color="primary" (click)="openTransactionDetails(transaction._id)">
                     <ion-icon name="search"></ion-icon> Info
-                </button>                
+                </button>
             </ion-item-options>
         </ion-item-sliding>
     </ion-list>

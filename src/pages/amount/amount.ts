@@ -16,26 +16,26 @@ const POSITION_DECIMALS = 'decimals';
 export class AmountPage {
 
     loader: Loading;
-    exchangedAmount:string; // either BTC or Fiat    
+    exchangedAmount:string; // either BTC or Fiat
     digits:string   = "0";
     decimals:string = "00";
     separator:string = ".";
- 
+
     position:string; // digits or decimals area
     index:number; // index of writing position
     entryInFiat:boolean = true;
     entryInBTC:boolean = false;
-        
+
     currency:string;
     bitcoinUnit:string;
-            
+
     constructor(
         private translation: TranslateService,
         private platform: Platform,
         private currencyService: CurrencyService,
         private config: Config,
         private navigation:NavController,
-        private loading: LoadingController) {                                   
+        private loading: LoadingController) {
     }
 
     startLoading() {
@@ -45,7 +45,7 @@ export class AmountPage {
                     content : text
                 });
                 this.loader.present();
-            });        
+            });
     }
 
     stopLoading() {
@@ -57,21 +57,25 @@ export class AmountPage {
             this.config.get(Config.CONFIG_KEY_CURRENCY) ,
             this.translation.get('FORMAT.CURRENCY_S').toPromise() ,
             this.config.get(Config.CONFIG_KEY_BITCOIN_UNIT) ,
-            this.currencyService.getSelectedCurrencyRate()
+            this.currencyService.getSelectedBitcoinCurrencyRate()
         ]).then(settings => {
             this.currency    = settings[0];
             this.separator   = settings[1];
-            this.bitcoinUnit = settings[2];            
+            this.bitcoinUnit = settings[2];
 
             if (settings[3] < 0) {
                 this.startLoading();
-                this.currencyService.updateCurrencyRate().then(() => {
+                Promise.all<any>([
+                  this.currencyService.updateBitcoinCurrencyRate(),
+                  this.currencyService.updateEthereumCurrencyRate()
+                ]).then(() => {
                     this.stopLoading();
                     this.resetAmount();
                 });
+
             } else {
                 this.resetAmount();
-            }        
+            }
         });
     }
 
@@ -83,8 +87,8 @@ export class AmountPage {
             this.entryInBTC  = false;
             this.entryInFiat = true;
         }
-        
-        this.resetAmount(); 
+
+        this.resetAmount();
     }
 
     backspaceInput() {
@@ -125,7 +129,7 @@ export class AmountPage {
         }
     }
 
-    numberInput(input:string) {        
+    numberInput(input:string) {
         if (this.position === POSITION_DIGITS) {
             this.digitInput(input.toString());
         } else if (this.position === POSITION_DECIMALS) {
@@ -156,43 +160,43 @@ export class AmountPage {
         this.digits = "0";
         this.decimals = "00";
         this.position = POSITION_DIGITS;
-        this.index = 0;        
+        this.index = 0;
         this.updateExchangedAmount();
     }
-    
+
     updateExchangedAmount() {
         let inputAmount = parseFloat(this.digits+"."+this.decimals);
 
-        this.currencyService.getCalculatedCurrencyRate().then(rate => {
+        this.currencyService.getCalculatedBitcoinCurrencyRate().then(rate => {
             if (this.entryInBTC) {
                 let amount = BitcoinUnit.from(inputAmount,this.bitcoinUnit).toFiat(rate);
-                this.exchangedAmount = this.currencyService.formatNumber(amount, this.separator, 2);                
+                this.exchangedAmount = this.currencyService.formatNumber(amount, this.separator, 2);
             } else if (this.entryInFiat) {
                 let amount = BitcoinUnit.fromFiat(inputAmount,rate).to(this.bitcoinUnit);
                 let decimalsCount = BitcoinUnit.decimalsCount(this.bitcoinUnit);
                 this.exchangedAmount = this.currencyService.formatNumber(amount, this.separator, decimalsCount, 2);
-            }            
-        });        
+            }
+        });
     }
 
     requestPayment() {
-        let amount = parseFloat(this.digits+"."+this.decimals);                
-        
-        if (amount <= 0) {            
+        let amount = parseFloat(this.digits+"."+this.decimals);
+
+        if (amount <= 0) {
             return;
         }
-        
+
         if (this.entryInBTC) {
             this.navigation.push('payment', {
                 amount: BitcoinUnit.from(amount,this.bitcoinUnit)
-            });                   
+            });
         } else {
-            this.currencyService.getCalculatedCurrencyRate().then(rate => {
+            this.currencyService.getCalculatedBitcoinCurrencyRate().then(rate => {
                 this.navigation.push('payment', {
-                    amount: BitcoinUnit.fromFiat(amount,rate) ,                
+                    amount: BitcoinUnit.fromFiat(amount,rate) ,
                 });
             });
-        }    
-    } 
-               
+        }
+    }
+
 }

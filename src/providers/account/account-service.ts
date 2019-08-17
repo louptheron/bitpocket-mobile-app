@@ -7,6 +7,9 @@ export const ACCOUNT_TYPE_BITCOIN_XPUB_KEY = "bitcoin-xpub-key";
 export const ACCOUNT_TYPE_TESTNET_ADDRESS  = "testnet-static-address";
 export const ACCOUNT_TYPE_TESTNET_TPUB_KEY = "testnet-tpub-key";
 
+export const ACCOUNT_TYPE_ETHEREUM_ADDRESS  = "ethereum-static-address";
+
+
 @Injectable()
 export class AccountService {
 
@@ -18,7 +21,7 @@ export class AccountService {
     parseAccountInput(input:string) : Account {
         return this.cryptocurrencyService.parseInput(input);
     }
-    
+
     addAccount(account:Account) : Promise<Account> {
         return new Promise<Account> ((resolve,reject) => {
             account['doctype'] = 'account';
@@ -26,7 +29,7 @@ export class AccountService {
             // default values
             account.index = 0;
             account.lastConfirmedIndex = -1;
-            
+
             this.repository.addDocument(account)
                 .then((response) => {
                     account._id = response.id;
@@ -96,7 +99,7 @@ export class AccountService {
                 } else {
                     reject();
                 }
-            });            
+            });
         });
     }
 
@@ -104,7 +107,7 @@ export class AccountService {
         return new Promise<Account> ((resolve, reject) => {
             this.config.get(Config.CONFIG_KEY_DEFAULT_ACCOUNT)
                 .then(accountId => {
-                    return this.getAccount(accountId);                    
+                    return this.getAccount(accountId);
                 }).then(account => {
                     resolve(account);
                 }).catch(() => {
@@ -129,19 +132,19 @@ export class AccountService {
                         resolve(this.getNextAddress(account));
                     } catch (e) {
                         reject(e);
-                    }                   
+                    }
                 }).catch(() => {
                     reject("couldn't find default address");
                 });
-        });        
+        });
     }
 
-    deriveAddress(account:Account, index:number) {        
-        return this.cryptocurrencyService.deriveAddress(account.data, index);        
+    deriveAddress(account:Account, index:number) {
+        return this.cryptocurrencyService.deriveAddress(account.data, index);
     }
 
     getNextAddress(account:Account) : string {
-        if(this.isAddressAccount(account)) {            
+        if(this.isAddressAccount(account)) {
             return account.data;
         }  else {
             return this.deriveAddress(account, account.index + 1);

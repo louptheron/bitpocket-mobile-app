@@ -19,7 +19,7 @@ export class TransactionPage {
 
     currencyThousandsPoint: string = "";
     currencySeparator: string = "";
-    currencyPrecision: number = 2;   
+    currencyPrecision: number = 2;
     currencySymbol:string = "BTC";
     dateTimeFormat: any;
     referenceCurrencySymbol:string = "";
@@ -35,7 +35,7 @@ export class TransactionPage {
         this.txid = navParams.get('txid');
     }
 
-    ionViewDidEnter() {           
+    ionViewDidEnter() {
         Promise.all<any>([
             this.translation.get('FORMAT.CURRENCY_T').toPromise() ,
             this.translation.get('FORMAT.CURRENCY_S').toPromise() ,
@@ -43,7 +43,7 @@ export class TransactionPage {
             this.translation.get('TEXT.LOADING_TRANSACTIONS').toPromise() ,
             this.config.get(Config.CONFIG_KEY_BITCOIN_UNIT) ,
             this.currencyService.getSelectedCurrency() ,
-            this.currencyService.getSelectedCurrencyRate() ,
+            this.currencyService.getSelectedBitcoinCurrencyRate() ,
             this.transactionStorageService.retrieveTransaction(this.txid)
         ]).then(promised => {
             this.currencyThousandsPoint = promised[0];
@@ -52,7 +52,7 @@ export class TransactionPage {
             this.currencySymbol = promised[4];
             this.currencyPrecision = BitcoinUnit.decimalsCount(promised[4]);
             this.referenceCurrencySymbol = promised[5];
-            this.referenceCurrencyRate = promised[6];  
+            this.referenceCurrencyRate = promised[6];
             this.transaction = promised[7];
         });
     }

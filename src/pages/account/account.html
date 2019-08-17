@@ -1,6 +1,6 @@
 <ion-header>
-    <ion-navbar>    
-        <button ion-button menuToggle="left"><ion-icon name="menu"></ion-icon></button>        
+    <ion-navbar>
+        <button ion-button menuToggle="left"><ion-icon name="menu"></ion-icon></button>
         <ion-title>{{ 'TITLE.ACCOUNTS' | translate }}</ion-title>
         <bitpocket-logo></bitpocket-logo>
     </ion-navbar>
@@ -9,8 +9,9 @@
 
     <ion-card *ngFor="let account of accounts; let i = index">
         <ion-item>
-            <ion-avatar item-left>                
+            <ion-avatar item-left>
                 <img *ngIf="account.icon == 'bitcoin'" src="assets/img/bitcoin-logo.png">
+                <img *ngIf="account.icon == 'ethereum'" src="assets/img/ethereum-logo.png">
                 <img *ngIf="account.icon == 'testnet'" src="assets/img/testnet-logo.png">
             </ion-avatar>
             <h2>{{ account.name }}</h2>

@@ -11,7 +11,9 @@ export class Config {
     static CONFIG_KEY_PAYMENT_REQUEST_LABEL = 'payment-request-label';
     static CONFIG_KEY_CURRENCY = 'currency';
     static CONFIG_KEY_BITCOIN_UNIT = 'bitcoin-unit';
-    static CONFIG_KEY_EXCHANGE_RATE = 'rate';
+    static CONFIG_KEY_ETHEREUM_UNIT = 'ethereum-unit';
+    static CONFIG_KEY_BITCOIN_EXCHANGE_RATE = 'bitcoin-rate';
+    static CONFIG_KEY_ETHEREUM_EXCHANGE_RATE = 'ethereum-rate';
     static CONFIG_KEY_PIN = 'pin';
     static CONFIG_KEY_DEFAULT_ACCOUNT = 'default-account';
     static CONFIG_KEY_CURRENCY_CACHE = 'currency-cache';
@@ -20,9 +22,11 @@ export class Config {
     initConfig() : Promise<boolean> {
         return new Promise<boolean>((resolve,reject) => {
             Promise.all<any>([
-                this.initialize(Config.CONFIG_KEY_EXCHANGE_RATE,-1),
+                this.initialize(Config.CONFIG_KEY_BITCOIN_EXCHANGE_RATE,-1),
+                this.initialize(Config.CONFIG_KEY_ETHEREUM_EXCHANGE_RATE,-1),
                 this.initialize(Config.CONFIG_KEY_CURRENCY,'EUR'),
                 this.initialize(Config.CONFIG_KEY_BITCOIN_UNIT,'mBTC'),
+                this.initialize(Config.CONFIG_KEY_ETHEREUM_UNIT,'Wei'),
                 this.initialize(Config.CONFIG_KEY_PIN,''),
                 this.initialize(Config.CONFIG_KEY_FEE_PERCENTAGE,0),
                 this.initialize(Config.CONFIG_KEY_CURRENCY_CACHE, [{
@@ -46,9 +50,9 @@ export class Config {
                 }
                 resolve(true);
             });
-        });        
+        });
     }
-    
+
     /**
      * init the key with the given value, only!
      * if there is no value set already
@@ -57,14 +61,14 @@ export class Config {
         return new Promise<boolean>((resolve,reject) => {
             this.isSet(key).then(status => {
                 if (!status) {
-                    this.storage.set(key,value);                    
+                    this.storage.set(key,value);
                 }
                 resolve(true);
             }).catch(() => {
                 resolve(false);
             });
-        });        
-    }    
+        });
+    }
 
     set(key:string, value:any) : Promise<any> {
         return this.storage.set(key, value);
@@ -73,5 +77,5 @@ export class Config {
     get(key:string) : Promise<any> {
         return this.storage.get(key);
     }
-        
+
 }

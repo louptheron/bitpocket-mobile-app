@@ -16,17 +16,17 @@ import 'rxjs/add/operator/toPromise';
     templateUrl : 'payment.html'
 })
 export class PaymentPage {
-    
+
     qrImage: any;
-    
+
     amount: BitcoinUnit;
-    
+
     fiatAmount: string = "";
-    bitcoinAmount: string = "";    
+    bitcoinAmount: string = "";
     currency: string = "";
     bitcoinUnit: string = "";
     currencyRate: number;
-    label:string = "";    
+    label:string = "";
     currencySeparator:string = ".";
     address: string;
     readableAmount: string;
@@ -41,17 +41,17 @@ export class PaymentPage {
         protected currencyService: CurrencyService ,
         protected config: Config,
         protected navigation:NavController,
-        params: NavParams) {     
-        this.amount = params.data.amount;        
+        params: NavParams) {
+        this.amount = params.data.amount;
     }
 
     ionViewWillEnter() {
         Promise.all<any>([
             this.config.get('currency') ,
             this.translation.get('FORMAT.CURRENCY_S').toPromise() ,
-            this.config.get('bitcoin-unit') , 
+            this.config.get('bitcoin-unit') ,
             this.accountService.getDefaultAddress() ,
-            this.currencyService.getCalculatedCurrencyRate() ,
+            this.currencyService.getCalculatedBitcoinCurrencyRate() ,
             this.config.get('payment-request-label')
         ]).then(promised => {       
             this.currency          = promised[0];
@@ -61,7 +61,7 @@ export class PaymentPage {
             this.currencyRate      = promised[4];
             this.label             = promised[5];
 
-            this.paymentRequest = {            
+            this.paymentRequest = {
                 address           : this.address ,
                 amount            : this.amount.to('BTC') ,
                 currency          : 'BTC' ,
@@ -70,7 +70,7 @@ export class PaymentPage {
             };
 
             this.fiatAmount    = this.currencyService.formatNumber(this.amount.toFiat(this.currencyRate, 2), this.currencySeparator);
-            this.bitcoinAmount = this.currencyService.formatNumber(this.amount.to(this.bitcoinUnit), this.currencySeparator, BitcoinUnit.decimalsCount(this.bitcoinUnit));                        
+            this.bitcoinAmount = this.currencyService.formatNumber(this.amount.to(this.bitcoinUnit), this.currencySeparator, BitcoinUnit.decimalsCount(this.bitcoinUnit));
             return this.createQrCode();
         }).then((qrImage) => {
             this.qrImage = qrImage;
@@ -78,7 +78,7 @@ export class PaymentPage {
         }).catch((e) => {
             this.navigation.setRoot('amount');
             console.error(e);
-        });          
+        });
     }
 
     createQrCode() {
@@ -87,7 +87,7 @@ export class PaymentPage {
                 amount : this.amount.to('BTC') ,
                 label  : this.label
             });
-                           
+
             let qr:any = qrcode(0,'M');
             qr.addData(bip21uri);
             qr.make();
@@ -113,20 +113,20 @@ export class PaymentPage {
                 this.paymentRequest.txAmount = result.amount;
                 this.paymentRequest.status = PAYMENT_STATUS_PARTIAL_PAID;
                 this.paymentReceived();
-            });        
+            });
     }
-        
+
     paymentReceived() {
         let audio = new Audio('assets/sound/paid.mp3');
-        audio.play(); 
+        audio.play();
 
         this.navigation.setRoot('payment-result', {
             paymentRequest: this.paymentRequest
-        });               
+        });
     }
 
     ionViewWillLeave() {
         this.paymentRequestHandler.cancel();
-    }    
-    
+    }
+
 }

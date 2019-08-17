@@ -1,13 +1,13 @@
 import { TransactionService } from './../../api/transaction-service';
 import { TransactionFilter } from './../../api/transaction-filter';
-import { CryptocurrencyService, BlockchainInfoService, InsightTransactionService, BITCOIN, TESTNET } from './../index';
+import { CryptocurrencyService, BlockchainInfoService, InsightBitcoinTransactionService, InsightEthereumTransactionService, BITCOIN, TESTNET, ETHEREUM } from './../index';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Transaction } from './../../api/transaction';
 
 @Injectable()
 export class TransactionServiceWrapper implements TransactionService {
-    
+
     protected instances:any = {};
 
     constructor(protected httpClient:HttpClient, protected cryptocurrencyService:CryptocurrencyService) {}
@@ -17,8 +17,11 @@ export class TransactionServiceWrapper implements TransactionService {
             this.instances[BITCOIN] = [];
             this.instances[TESTNET] = [];
             this.instances[BITCOIN].push(new BlockchainInfoService(this.httpClient));
-            this.instances[BITCOIN].push(new InsightTransactionService(this.httpClient, 'https://insight.bitpay.com'));
-            this.instances[TESTNET].push(new InsightTransactionService(this.httpClient, 'https://test-insight.bitpay.com', TESTNET));
+            this.instances[BITCOIN].push(new InsightBitcoinTransactionService(this.httpClient, 'https://insight.bitpay.com'));
+            this.instances[TESTNET].push(new InsightBitcoinTransactionService(this.httpClient, 'https://test-insight.bitpay.com', TESTNET));
+
+            this.instances[ETHEREUM] = [];
+            this.instances[ETHEREUM].push(new InsightEthereumTransactionService(this.httpClient, 'http://api.etherscan.io', ETHEREUM))
         }
     }
 
@@ -29,8 +32,10 @@ export class TransactionServiceWrapper implements TransactionService {
 
     triggerRandomInstance(filter:TransactionFilter, cryptocurrency:string) {
         return new Promise<Transaction[]> ((resolve, reject) => {
+
             this.getInstance(cryptocurrency).findTransactions(filter)
                 .then(result => {
+                  console.log(result)
                     resolve(result);
                 }).catch(() => {
                     resolve(this.triggerRandomInstance(filter, cryptocurrency));
@@ -40,6 +45,7 @@ export class TransactionServiceWrapper implements TransactionService {
 
     getInstance(cryptocurrency:string) : TransactionService {
         let index = Math.floor(Math.random() * this.instances[cryptocurrency].length);
+        console.log(this.instances[cryptocurrency][index], index)
         return this.instances[cryptocurrency][index];
     }
 
@@ -48,7 +54,7 @@ export class TransactionServiceWrapper implements TransactionService {
             return this.cryptocurrencyService.parseInput(filter.addresses[0]).currency;
         } else {
             return BITCOIN;
-        }         
+        }
     }
 
 }

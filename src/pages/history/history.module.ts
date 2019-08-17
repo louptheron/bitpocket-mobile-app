@@ -3,7 +3,8 @@ import { IonicPageModule } from 'ionic-angular';
 import { LogoModule } from '../../components/logo/logo.module';
 import { BitpocketCurrencyPipeModule } from '../../pipes/bitpocket-currency/bitpocket-currency.module';
 import { BitpocketUnitPipeModule } from '../../pipes/bitpocket-unit/bitpocket-unit.module';
-import { BitpocketFiatPipeModule } from '../../pipes/bitpocket-fiat/bitpocket-fiat.module';
+import { BitcoinFiatPipeModule } from '../../pipes/bitcoin-fiat/bitcoin-fiat.module';
+import { EthereumFiatPipeModule } from '../../pipes/ethereum-fiat/ethereum-fiat.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { HistoryPage } from './history';
 
@@ -17,7 +18,8 @@ import { HistoryPage } from './history';
     TranslateModule ,
     BitpocketCurrencyPipeModule ,
     BitpocketUnitPipeModule ,
-    BitpocketFiatPipeModule
+    BitcoinFiatPipeModule,
+    EthereumFiatPipeModule
   ],
   exports: [
     HistoryPage
