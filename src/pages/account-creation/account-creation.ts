@@ -11,7 +11,7 @@ import 'rxjs/add/operator/toPromise';
     templateUrl : 'account-creation.html'
 })
 export class AccountCreationPage {
-    
+
     accountInput:string = "";
     account:any = null;
     loading:boolean = false;
@@ -24,7 +24,7 @@ export class AccountCreationPage {
         private nav:NavController,
         private alertController: AlertController,
         private menuController: MenuController,
-        private translate: TranslateService) {              
+        private translate: TranslateService) {
     }
 
     ionViewWillEnter() {
@@ -38,8 +38,8 @@ export class AccountCreationPage {
 
     parseAccount() {
         let account = this.accountService.parseAccountInput(this.accountInput);
-        account.name = "Bitcoin";        
-        return account;          
+        account.name = "New account";
+        return account;
     }
 
     triggerAlert() {
@@ -65,12 +65,15 @@ export class AccountCreationPage {
             if (!this.account) {
                 this.account = this.parseAccount();
             }
-            
-            console.log(this.account);
+
+            let currency = this.accountService.parseAccountInput(this.account.data).currency;
             this.accountService.addAccount(this.account)
                 .then(account => {
                     this.account = account;
-                    return this.config.set(Config.CONFIG_KEY_DEFAULT_ACCOUNT, account._id);
+                    const cryptoInUpperCase = currency.toUpperCase();
+                    const configAccountPropertyName = "CONFIG_KEY_DEFAULT_" + cryptoInUpperCase + "_ACCOUNT";
+
+                    return this.config.set(Config[configAccountPropertyName], account._id);
                 }).then(() => {
                     return this.accountSyncService.syncAccount(this.account);
                 }).then(() => {
@@ -82,20 +85,20 @@ export class AccountCreationPage {
         } catch (e) {
             this.account = '';
             this.triggerAlert();
-        }  
+        }
     }
 
     scan() {
         this.qrscanner.scan((text) => {
             this.accountInput = text;
             let account = this.parseAccount();
-            
+
             if (account) {
                 this.account = account;
                 return true;
-            } else {                
+            } else {
                 return false;
-            }            
+            }
         });
     }
 

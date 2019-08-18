@@ -1,0 +1,18 @@
+<ion-header>
+    <ion-navbar>
+        <button ion-button menuToggle="left"><ion-icon name="menu"></ion-icon></button>
+        <ion-title>{{ 'TITLE.SELECT_CRYPTO' | translate }}</ion-title>
+        <bitpocket-logo></bitpocket-logo>
+    </ion-navbar>
+</ion-header>
+<ion-content no-scroll>
+    <ion-card *ngFor="let cryptocurrency of cryptocurrencies; let i = index">
+        <ion-item (click)="requestPayment(i)">
+            <ion-avatar item-left>
+                <img *ngIf="cryptocurrency == 'bitcoin'" src="assets/img/bitcoin-logo.png">
+                <img *ngIf="cryptocurrency == 'ethereum'" src="assets/img/ethereum-logo.png">
+            </ion-avatar>
+            <h2>{{ cryptocurrency | titlecase }}</h2>
+        </ion-item>
+    </ion-card>
+</ion-content>

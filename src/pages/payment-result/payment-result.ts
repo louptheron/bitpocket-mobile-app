@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NavParams, NavController, IonicPage } from 'ionic-angular';
-import { CryptocurrencyService, CurrencyService, Config, AccountService, BitcoinUnit, AccountSyncService } from '../../providers/index';
+import { CryptocurrencyService, CurrencyService, Config, AccountService, BitcoinUnit, EthereumUnit, AccountSyncService, ETHEREUM, BITCOIN } from '../../providers/index';
 import { TranslateService } from '@ngx-translate/core';
 import { PaymentRequest, PAYMENT_STATUS_RECEIVED, PAYMENT_STATUS_OVERPAID, PAYMENT_STATUS_PARTIAL_PAID } from './../../api/payment-request';
 import { Account } from './../../api/account';
@@ -14,20 +14,20 @@ import 'rxjs/add/operator/toPromise';
     templateUrl : 'payment-result.html'
 })
 export class PaymentResultPage {
-    
+
     resultSuccess : boolean = false;
     resultIcon : string = "";
     resultText : string = "";
     paymentRequest:PaymentRequest;
     account:Account = null;
-    
+
     currency:string = "";
     amount:string = "";
     referenceCurrency = "";
     referenceAmount = "";
 
     waiting:boolean = true;
-    
+
     getResultClasses() {
         if (this.resultSuccess) {
             return { "transaction-success" : true , "transaction-failed" : false };
@@ -48,28 +48,35 @@ export class PaymentResultPage {
             this.resultIcon = "checkmark-circle";
         } else if (this.paymentRequest.status == PAYMENT_STATUS_OVERPAID ||
                    this.paymentRequest.status == PAYMENT_STATUS_PARTIAL_PAID) {
-            // change referenceAmount in accordance               
+            // change referenceAmount in accordance
             this.paymentRequest.referenceAmount = this.paymentRequest.referenceAmount * (this.paymentRequest.txAmount / this.paymentRequest.amount);
             this.resultSuccess = true;
             this.resultIcon = "alert";
         } else {
             this.resultIcon = "close-circle";
         }
-        
+
+        const cryptoInUpperCase = this.paymentRequest.currency.toUpperCase();
+
         Promise.all<any>([
-            this.config.get(Config.CONFIG_KEY_BITCOIN_UNIT) ,
+            this.config.get(Config["CONFIG_KEY_" + cryptoInUpperCase + "_UNIT"]) ,
             this.translate.get('FORMAT.CURRENCY_S').toPromise() ,
             this.translate.get('PAYMENT_STATUS.' + this.paymentRequest.status).toPromise() ,
-            this.accountService.getDefaultAccount()
+            this.accountService.getDefaultAccount(this.paymentRequest.currency)
         ]).then(promised => {
             this.account = promised[3];
             this.currency = promised[0];
             this.referenceCurrency = this.paymentRequest.referenceCurrency;
-            this.amount = this.currencyService.formatNumber(BitcoinUnit.from(this.paymentRequest.txAmount,'BTC').to(this.currency), promised[1], BitcoinUnit.decimalsCount(this.currency));           
+            if(this.paymentRequest.currency == BITCOIN) {
+                this.amount = this.currencyService.formatNumber(BitcoinUnit.from(this.paymentRequest.txAmount,'BTC').to(this.currency), promised[1], BitcoinUnit.decimalsCount(this.currency));
+            } else if(this.paymentRequest.currency == ETHEREUM) {
+                this.amount = this.currencyService.formatNumber(EthereumUnit.from(this.paymentRequest.txAmount,'Wei').to(this.currency), promised[1], EthereumUnit.decimalsCount(this.currency));
+            }
             this.referenceAmount = this.currencyService.formatNumber(this.paymentRequest.referenceAmount, promised[1]);
             this.resultText = promised[2];
-                    
+
             if (this.resultSuccess) {
+                console.log(this.paymentRequest)
                 this.accountSyncService.storeTransaction({
                     _id       : this.paymentRequest.txid ,
                     amount    : this.paymentRequest.txAmount ,
@@ -84,15 +91,15 @@ export class PaymentResultPage {
                     // TODO: is a sync required at this moment?
                     // index needs to be updated
                     this.accountSyncService.syncAccount(this.account);
-                });                                       
+                });
             }
         });
     }
 
-    showHistory() {        
+    showHistory() {
         this.nav.setRoot('history', { accountId : this.account._id });
     }
-    
+
     constructor(
         protected cryptocurrencyService: CryptocurrencyService ,
         protected accountSyncService: AccountSyncService,
@@ -102,5 +109,5 @@ export class PaymentResultPage {
         protected config: Config,
         protected params: NavParams,
         protected nav: NavController) {}
-    
+
 }

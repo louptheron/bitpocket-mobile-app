@@ -15,7 +15,8 @@ export class Config {
     static CONFIG_KEY_BITCOIN_EXCHANGE_RATE = 'bitcoin-rate';
     static CONFIG_KEY_ETHEREUM_EXCHANGE_RATE = 'ethereum-rate';
     static CONFIG_KEY_PIN = 'pin';
-    static CONFIG_KEY_DEFAULT_ACCOUNT = 'default-account';
+    static CONFIG_KEY_DEFAULT_BITCOIN_ACCOUNT = 'default-bitcoin-account';
+    static CONFIG_KEY_DEFAULT_ETHEREUM_ACCOUNT = 'default-ethereum-account';
     static CONFIG_KEY_CURRENCY_CACHE = 'currency-cache';
     static CONFIG_KEY_FEE_PERCENTAGE = 'fee-percentage';
 

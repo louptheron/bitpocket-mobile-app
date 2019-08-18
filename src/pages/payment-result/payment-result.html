@@ -5,7 +5,7 @@
     </ion-navbar>
 </ion-header>
 <ion-content [ngClass]="getResultClasses()" no-scroll>
-        
+
         <div class="payment-specification">
             <div class="payment-currency vertical-align">{{ referenceCurrency }}</div>
             <div class="payment-amount">
@@ -33,6 +33,6 @@
         </div>
 
         <div class="button-bottom">
-            <button ion-button class="text-uppercase button-large" (click)="showHistory()">{{ 'BUTTON.SHOW_DETAILS' | translate }}</button>           
+            <button ion-button class="text-uppercase button-large" (click)="showHistory()">{{ 'BUTTON.SHOW_DETAILS' | translate }}</button>
         </div>
 </ion-content>

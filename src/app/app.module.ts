@@ -94,7 +94,7 @@ export function createTranslateLoader(http: HttpClient) {
     { provide: AccountSyncService, useFactory: provideAccountSyncService, deps: [TransactionServiceWrapper, TransactionStorageService, AccountService, CryptocurrencyService] } ,
     { provide: TransactionServiceWrapper, useFactory: provideTransactionService, deps: [HttpClient, CryptocurrencyService] } ,
     { provide: TransactionStorageService, useFactory: provideTransactionStorageService, deps: [Repository] } ,
-    { provide: PaymentService, useFactory: providePaymentService, deps: [TransactionServiceWrapper, CryptocurrencyService] } ,
+    { provide: PaymentService, useFactory: providePaymentService, deps: [HttpClient, TransactionServiceWrapper, CryptocurrencyService] } ,
     { provide: CryptocurrencyService, useFactory: provideCryptocurrencyService } ,
     { provide: Repository, useFactory:provideRepository } ,
     { provide:Config, useFactory:provideConfig, deps:[Storage] } ,

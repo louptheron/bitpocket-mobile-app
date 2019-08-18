@@ -10,6 +10,7 @@
 
     "TITLE.ACCOUNTS" : "Accounts",
     "TITLE.REQUEST_AMOUNT" : "Payment",
+    "TITLE.SELECT_CRYPTO" : "Crypto Selection",
     "TITLE.HISTORY" : "Transaction History",
     "TITLE.SETTINGS" : "Settings",
     "TITLE.GENERAL" : "General settings",
@@ -77,6 +78,7 @@
     "LIST_HEADING.BITCOIN_UNIT" : "Bitcoin unit",
     "LIST_HEADING.TRANSACTION" : "Transaction details",
     "LIST_HEADING.PAYMENT" : "Payment details",
+    "LIST_HEADING.SELECT_CRYPTO" : "Select cryptocurrency",
     "LIST_HEADING.EXCHANGE_RATE_FEE" : "Exchange percentage",
 
     "LIST_TEXT.GENERAL_SETTINGS" : "General settings for BitPocket",

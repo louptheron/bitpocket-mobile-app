@@ -186,17 +186,9 @@ export class AmountPage {
             return;
         }
 
-        if (this.entryInBTC) {
-            this.navigation.push('payment', {
-                amount: BitcoinUnit.from(amount,this.bitcoinUnit)
-            });
-        } else {
-            this.currencyService.getCalculatedBitcoinCurrencyRate().then(rate => {
-                this.navigation.push('payment', {
-                    amount: BitcoinUnit.fromFiat(amount,rate) ,
-                });
-            });
-        }
+        this.navigation.push('select-crypto', {
+            amount: amount ,
+        });
     }
 
 }

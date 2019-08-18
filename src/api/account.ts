@@ -6,4 +6,5 @@ export interface Account {
     default?:boolean;
     index?:number;
     lastConfirmedIndex?:number;
+    currency?:string;
 }

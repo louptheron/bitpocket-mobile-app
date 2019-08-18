@@ -6,7 +6,7 @@ import { Config, AccountService, AccountSyncService, QRScanner } from './../../p
 import 'rxjs/add/operator/toPromise';
 
 @IonicPage({
-    name : 'account-form' ,    
+    name : 'account-form' ,
     defaultHistory: ['account']
 })
 @Component({
@@ -42,13 +42,14 @@ export class AccountFormPage {
         if (id) {
             Promise.all<any>([
                 this.accountService.getAccount(id),
-                this.config.get(Config.CONFIG_KEY_DEFAULT_ACCOUNT),
-                this.accountService.getAccounts()                
+                this.config.get(Config.CONFIG_KEY_DEFAULT_BITCOIN_ACCOUNT),
+                this.config.get(Config.CONFIG_KEY_DEFAULT_ETHEREUM_ACCOUNT),
+                this.accountService.getAccounts()
             ]).then(promised => {
                 this.account = promised[0];
-                this.accountDefault = promised[0]._id == promised[1];
+                this.accountDefault = promised[0]._id == promised[1] || promised[0]._id == promised[2];
                 this.accountEnabled = false;
-                this.canChangeDefaultAccount = promised[2].length > 1 && !this.accountDefault;
+                this.canChangeDefaultAccount = promised[3].length > 1 && !this.accountDefault;
             });
         }
     }
@@ -62,7 +63,7 @@ export class AccountFormPage {
             } catch (e) {
                 console.error(e);
                 return false;
-            }                           
+            }
         });
     }
 
@@ -71,7 +72,7 @@ export class AccountFormPage {
             return true;
         }
 
-        return new Promise<void> ((resolve, reject) => {            
+        return new Promise<void> ((resolve, reject) => {
             this.save()
                 .then(() => {
                     resolve();
@@ -99,19 +100,19 @@ export class AccountFormPage {
                                     }
                                 }]
                         });
-                        alert.present();                
-                        this.account.data = "";                        
+                        alert.present();
+                        this.account.data = "";
                     });
             });
         });
     }
 
     ionViewCanEnter() : Promise<void> {
-        return new Promise<void>((resolve, reject) => {          
+        return new Promise<void>((resolve, reject) => {
             this.config.get(Config.CONFIG_KEY_PIN).then(value => {
                 if (value === '') {
                     resolve();
-                } else {                    
+                } else {
                     let modal:Modal = this.modalController.create('pincode', { token : value, closable : true });
 
                     modal.present();
@@ -134,33 +135,36 @@ export class AccountFormPage {
                 let parsedAccount = this.accountService.parseAccountInput(this.account.data);
                 this.account.data = parsedAccount.data;
                 this.account.type = parsedAccount.type;
-            
+
                 if (this.account._id) {
                     promise = this.accountService.editAccount(this.account);
                 } else {
-                    promise = this.addAccount();                    
+                    promise = this.addAccount();
                 }
 
                 promise.then((account) => {
                     if (this.accountDefault) {
-                        resolve(this.config.set(Config.CONFIG_KEY_DEFAULT_ACCOUNT, account._id));
+                        const cryptoInUpperCase = parsedAccount.currency.toUpperCase();
+                        const configAccountPropertyName = "CONFIG_KEY_DEFAULT_" + cryptoInUpperCase + "_ACCOUNT";
+
+                        resolve(this.config.set(Config[configAccountPropertyName], account._id));
                     } else {
                         resolve();
-                    }                    
+                    }
                 }).catch(() => {
                     reject();
                 });
             } catch (e) {
                 reject();
-            }  
-        });        
+            }
+        });
     }
 
     addAccount() : Promise<Account> {
         return new Promise<Account> ((resolve, reject) => {
             this.presentLoader();
             this.accountService.addAccount(this.account)
-                .then((account:Account) => {                    
+                .then((account:Account) => {
                     return this.accountSyncService.syncAccount(account);
                 }).then(() => {
                     this.dissmissLoader();
@@ -169,7 +173,7 @@ export class AccountFormPage {
                     this.dissmissLoader();
                     resolve(this.account);
                 });
-        });        
+        });
     }
 
     presentLoader() {
@@ -206,13 +210,13 @@ export class AccountFormPage {
                                 .then(() => {
                                     this.removed = true;
                                     this.navController.pop();
-                                });                            
+                                });
                         }
                     },
                     texts[3]
                 ]
             });
-            alert.present();                
+            alert.present();
         });
     }
 

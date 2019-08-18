@@ -2,7 +2,8 @@ import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
 import { BitpocketCurrencyPipeModule } from '../../pipes/bitpocket-currency/bitpocket-currency.module';
 import { BitpocketUnitPipeModule } from '../../pipes/bitpocket-unit/bitpocket-unit.module';
-import { BitpocketFiatPipeModule } from '../../pipes/bitpocket-fiat/bitpocket-fiat.module';
+import { BitcoinFiatPipeModule } from '../../pipes/bitcoin-fiat/bitcoin-fiat.module';
+import { EthereumFiatPipeModule } from '../../pipes/ethereum-fiat/ethereum-fiat.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { TransactionPage } from './transaction';
 
@@ -15,7 +16,8 @@ import { TransactionPage } from './transaction';
     TranslateModule ,
     BitpocketCurrencyPipeModule ,
     BitpocketUnitPipeModule ,
-    BitpocketFiatPipeModule
+    BitcoinFiatPipeModule ,
+    EthereumFiatPipeModule
   ],
 })
 export class TransactionPageModule {}

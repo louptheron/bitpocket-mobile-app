@@ -8,11 +8,13 @@ import { InsightEthereumTransactionService } from './transaction/insight-ethereu
 import { BlockchainInfoService } from './transaction/blockchain-info-service/blockchain-info-service';
 import { QRScanner } from './qrscanner/qrscanner';
 import { PaymentService } from './payment/payment-service';
-import { InsightPaymentRequestHandler } from './payment/payment-request-handler/insight-payment-request-handler';
+import { InsightBitcoinPaymentRequestHandler } from './payment/payment-request-handler/insight-bitcoin-payment-request-handler';
+import { InsightEthereumPaymentRequestHandler } from './payment/payment-request-handler/insight-ethereum-payment-request-handler';
 import { BitcoinAverageExchangeService } from './currency/bitcoinaverage-service';
 import { EthereumAverageExchangeService } from './currency/ethereumaverage-service';
 import { BitcoinUnit } from './currency/bitcoin-unit';
 import { EthereumUnit } from './currency/ethereum-unit';
+import { CryptoUnit } from './currency/crypto-unit';
 import { CurrencyService } from './currency/currency-service';
 import { AccountService, ACCOUNT_TYPE_BITCOIN_ADDRESS, ACCOUNT_TYPE_BITCOIN_XPUB_KEY, ACCOUNT_TYPE_TESTNET_ADDRESS, ACCOUNT_TYPE_TESTNET_TPUB_KEY, ACCOUNT_TYPE_ETHEREUM_ADDRESS } from './account/account-service';
 import { AccountSyncService } from './account/account-sync-service';
@@ -57,8 +59,8 @@ export function provideTransactionStorageService(repository:Repository) {
     return new TransactionStorageService(repository);
 }
 
-export function providePaymentService(transactionService:TransactionServiceWrapper, cryptocurrencyService:CryptocurrencyService) {
-    return new PaymentService(transactionService, cryptocurrencyService);
+export function providePaymentService(http:HttpClient, transactionService:TransactionServiceWrapper, cryptocurrencyService:CryptocurrencyService) {
+    return new PaymentService(http, transactionService, cryptocurrencyService);
 }
 
 export function provideCryptocurrencyService() {
@@ -88,6 +90,7 @@ export function provideEthereumAverageExchangeService(http:HttpClient, config:Co
 export {
     Config ,
     Repository ,
+    CryptoUnit ,
     BitcoinUnit ,
     EthereumUnit ,
     AccountService ,
@@ -96,7 +99,8 @@ export {
     CryptocurrencyService ,
     BitcoinAverageExchangeService,
     EthereumAverageExchangeService,
-    InsightPaymentRequestHandler,
+    InsightBitcoinPaymentRequestHandler,
+    InsightEthereumPaymentRequestHandler,
     PaymentService,
     QRScanner,
     TransactionStorageService,

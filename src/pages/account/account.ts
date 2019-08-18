@@ -36,19 +36,22 @@ export class AccountPage {
 
         Promise.all<any>([
             this.accountService.getAccounts() ,
-            this.config.get(Config.CONFIG_KEY_DEFAULT_ACCOUNT)
+            this.config.get(Config.CONFIG_KEY_DEFAULT_BITCOIN_ACCOUNT),
+            this.config.get(Config.CONFIG_KEY_DEFAULT_ETHEREUM_ACCOUNT),
         ]).then(promised => {
             for (let account of promised[0]) {
                 if (/bitcoin/.test(account.type)) {
                     account['icon'] = 'bitcoin';
+                    this.defaultAccount = promised[1];
                 }
                 if (/ethereum/.test(account.type)) {
                     account['icon'] = 'ethereum';
+                    this.defaultAccount = promised[2];
                 }
                 if (/testnet/.test(account.type)) {
                     account['icon'] = 'testnet';
+                    this.defaultAccount = promised[1];
                 }
-                this.defaultAccount = promised[1];
                 this.accounts.push(account);
             }
         });

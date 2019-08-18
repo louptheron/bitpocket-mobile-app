@@ -79,7 +79,6 @@ export class HistoryPage {
             this.currencySymbol = promised[4];
             this.currencyPrecision = isEthereum ? EthereumUnit.decimalsCount(promised[4]) : BitcoinUnit.decimalsCount(promised[4]);
             this.referenceCurrencySymbol = promised[5];
-            console.log(promised[6])
             this.referenceCurrencyRate = promised[6];
             this.account = promised[7];
 

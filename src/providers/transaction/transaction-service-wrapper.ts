@@ -35,7 +35,6 @@ export class TransactionServiceWrapper implements TransactionService {
 
             this.getInstance(cryptocurrency).findTransactions(filter)
                 .then(result => {
-                  console.log(result)
                     resolve(result);
                 }).catch(() => {
                     resolve(this.triggerRandomInstance(filter, cryptocurrency));
@@ -45,7 +44,6 @@ export class TransactionServiceWrapper implements TransactionService {
 
     getInstance(cryptocurrency:string) : TransactionService {
         let index = Math.floor(Math.random() * this.instances[cryptocurrency].length);
-        console.log(this.instances[cryptocurrency][index], index)
         return this.instances[cryptocurrency][index];
     }
 

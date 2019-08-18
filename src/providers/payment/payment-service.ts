@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
-import { TransactionServiceWrapper, InsightPaymentRequestHandler, CryptocurrencyService, BITCOIN, TESTNET } from '../index';
+import { HttpClient } from '@angular/common/http';
+import { TransactionServiceWrapper, InsightBitcoinPaymentRequestHandler, InsightEthereumPaymentRequestHandler, CryptocurrencyService, BITCOIN, TESTNET, ETHEREUM } from '../index';
 import { PaymentRequest } from './../../api/payment-request';
 import { PaymentRequestHandler } from './../../api/payment-request-handler';
 import * as payment from '../../api/payment-service';
@@ -8,6 +9,7 @@ import * as payment from '../../api/payment-service';
 export class PaymentService implements payment.PaymentService {
 
     constructor(
+        protected http: HttpClient ,
         protected transactionService: TransactionServiceWrapper ,
         protected cryptocurrencyService: CryptocurrencyService
     ) {}
@@ -16,9 +18,11 @@ export class PaymentService implements payment.PaymentService {
         let currency = this.cryptocurrencyService.parseInput(paymentRequest.address).currency;
 
         if (currency == BITCOIN) {
-            return InsightPaymentRequestHandler.createPaymentRequestHandler(paymentRequest, this.transactionService, 'https://insight.bitpay.com');
+            return InsightBitcoinPaymentRequestHandler.createBitcoinPaymentRequestHandler(paymentRequest, this.transactionService, 'https://insight.bitpay.com');
+        } else if (currency == ETHEREUM) {
+            return InsightEthereumPaymentRequestHandler.createEthereumPaymentRequestHandler(paymentRequest, this.transactionService, 'wss://mainnet.infura.io/ws', 'https://api.etherscan.io', this.http);
         } else if (currency == TESTNET) {
-            return InsightPaymentRequestHandler.createPaymentRequestHandler(paymentRequest, this.transactionService, 'https://test-insight.bitpay.com');
+            return InsightBitcoinPaymentRequestHandler.createBitcoinPaymentRequestHandler(paymentRequest, this.transactionService, 'https://test-insight.bitpay.com');
         }
     }
 

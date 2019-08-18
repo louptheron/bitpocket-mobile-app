@@ -1,3 +1,4 @@
+import { CryptoUnit } from './crypto-unit';
 
 const ETHEREUM_UNITS = {
     'ETH'  :     [1e18,18] ,
@@ -5,7 +6,7 @@ const ETHEREUM_UNITS = {
     'Wei'  :     [1,0]
 };
 
-export class EthereumUnit {
+export class EthereumUnit implements CryptoUnit {
     // internal representation is in satoshis
     private wei: number = 0;
 
@@ -38,8 +39,8 @@ export class EthereumUnit {
         return EthereumUnit.from(valueInETH, 'ETH');
     }
 
-    to(ethereumUnit: string = 'Wei') : number {
-        let unitSpec = EthereumUnit.getUnitSpecification(ethereumUnit);
+    to(unit: string = 'Wei') : number {
+        let unitSpec = EthereumUnit.getUnitSpecification(unit);
         return parseFloat( (this.wei / unitSpec[0]).toFixed(unitSpec[1]) );
     }
 

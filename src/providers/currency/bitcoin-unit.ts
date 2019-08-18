@@ -1,3 +1,5 @@
+import { CryptoUnit } from './crypto-unit';
+
 const BITCOIN_UNITS = {
     'BTC'  :     [1e8,8] ,
     'mBTC' :     [1e5,5] ,
@@ -5,7 +7,7 @@ const BITCOIN_UNITS = {
     'satoshis' : [1,0]
 };
 
-export class BitcoinUnit {
+export class BitcoinUnit implements CryptoUnit {
     // internal representation is in satoshis
     private satoshis: number = 0;
 
@@ -38,8 +40,8 @@ export class BitcoinUnit {
         return BitcoinUnit.from(valueInBTC, 'BTC');
     }
 
-    to(bitcoinUnit: string = 'satoshis') : number {
-        let unitSpec = BitcoinUnit.getUnitSpecification(bitcoinUnit);
+    to(unit: string = 'satoshis') : number {
+        let unitSpec = BitcoinUnit.getUnitSpecification(unit);
         return parseFloat( (this.satoshis / unitSpec[0]).toFixed(unitSpec[1]) );
     }
 

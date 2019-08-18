@@ -1,4 +1,4 @@
-import { TransactionStorageService, Config, CurrencyService, BitcoinUnit } from './../../providers/index';
+import { TransactionStorageService, Config, CurrencyService, BitcoinUnit, EthereumUnit } from './../../providers/index';
 import { Transaction } from './../../api/transaction';
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angular';
@@ -35,6 +35,7 @@ export class TransactionPage {
         this.txid = navParams.get('txid');
     }
 
+    // TODO: Make this working also for ETH
     ionViewDidEnter() {
         Promise.all<any>([
             this.translation.get('FORMAT.CURRENCY_T').toPromise() ,

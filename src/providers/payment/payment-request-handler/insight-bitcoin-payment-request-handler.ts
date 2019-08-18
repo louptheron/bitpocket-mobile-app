@@ -3,8 +3,9 @@ import { TransactionService } from './../../../api/transaction-service';
 import { PaymentRequest, PAYMENT_STATUS_SERVICE_ERROR, PAYMENT_STATUS_RECEIVED, PAYMENT_STATUS_PARTIAL_PAID, PAYMENT_STATUS_OVERPAID } from './../../../api/payment-request';
 import { EventEmitter } from 'events';
 import * as io from 'socket.io-client';
+import { BITCOIN } from '../../index';
 
-export class InsightPaymentRequestHandler extends EventEmitter implements PaymentRequestHandler {
+export class InsightBitcoinPaymentRequestHandler extends EventEmitter implements PaymentRequestHandler {
 
     protected _paymentRequest: PaymentRequest;
     protected socket: SocketIO.Socket;
@@ -19,8 +20,8 @@ export class InsightPaymentRequestHandler extends EventEmitter implements Paymen
         super();
     }
 
-    static createPaymentRequestHandler(paymentRequest: PaymentRequest, transactionService: TransactionService, serviceUrl:string) {
-        let handler = new InsightPaymentRequestHandler();
+    static createBitcoinPaymentRequestHandler(paymentRequest: PaymentRequest, transactionService: TransactionService, serviceUrl:string) {
+        let handler = new InsightBitcoinPaymentRequestHandler();
         handler._paymentRequest = paymentRequest;
         handler.transactionService = transactionService;
         handler.serviceUrl = serviceUrl;
@@ -33,14 +34,14 @@ export class InsightPaymentRequestHandler extends EventEmitter implements Paymen
             this.socket = io(this.serviceUrl);
             this.socket.on('error', () => {
                 this.emit("payment-status:" + PAYMENT_STATUS_SERVICE_ERROR);
-            }).on('bitcoind/addresstxid', data => {                
+            }).on('bitcoind/addresstxid', data => {
                 this.triggerStatusUpdate(data.txid)
                     .then((close:boolean) => {
                         if (close && this && this.cancel) {
                             this.cancel();
                         }
                     });
-            }).on('connect', () => { 
+            }).on('connect', () => {
                 this.socket.emit('subscribe', 'bitcoind/addresstxid', [ this.paymentRequest.address ]);
             });
         } catch (e) {
@@ -58,7 +59,8 @@ export class InsightPaymentRequestHandler extends EventEmitter implements Paymen
                     let event = {
                         txid    : txid ,
                         address : this.paymentRequest.address ,
-                        amount  : transactions[0].amount
+                        amount  : transactions[0].amount ,
+                        currency: BITCOIN
                     };
 
                     if (transactions[0].amount < this.paymentRequest.amount) {

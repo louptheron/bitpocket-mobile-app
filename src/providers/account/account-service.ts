@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import { Account } from '../../api/account';
-import { Config, CryptocurrencyService, Repository } from './../index';
+import { Config, CryptocurrencyService, Repository, ETHEREUM, BITCOIN } from './../index';
 
 export const ACCOUNT_TYPE_BITCOIN_ADDRESS  = "bitcoin-static-address";
 export const ACCOUNT_TYPE_BITCOIN_XPUB_KEY = "bitcoin-xpub-key";
@@ -83,17 +83,31 @@ export class AccountService {
         return new Promise<void> ((resolve, reject) => {
             Promise.all([
                 this.getAccounts() ,
-                this.config.get(Config.CONFIG_KEY_DEFAULT_ACCOUNT)
+                this.config.get(Config.CONFIG_KEY_DEFAULT_BITCOIN_ACCOUNT),
+                this.config.get(Config.CONFIG_KEY_DEFAULT_ETHEREUM_ACCOUNT)
             ]).then((promised:any) => {
-                if (promised[0].length > 1 && id != promised[1]) {
+                if (promised[0].length > 1 && id != promised[1] && id != promised[2]) {
                     resolve(this.repository.removeDocument(id));
-                } else if (promised[0].length > 1 && id == promised[1]) {
+                } else if (promised[0].length > 1 && id == promised[1]) { // BITCOIN
                     // select an account which is not the default Account, and set it as the default account
-                    for (let i = 0; i < promised[0].length; i++) {
-                        if (promised[0][i]._id != id) {
-                            this.config.set(Config.CONFIG_KEY_DEFAULT_ACCOUNT, promised[0][i]._id);
+                    let bitcoinAccounts = promised[0].filter(account => account.currency == BITCOIN)
+                    for (let i = 0; i < bitcoinAccounts.length; i++) {
+                        if (bitcoinAccounts[i]._id != id) {
+                            this.config.set(Config.CONFIG_KEY_DEFAULT_BITCOIN_ACCOUNT, bitcoinAccounts[i]._id);
                             break;
                         }
+                    }
+                    resolve(this.repository.removeDocument(id));
+                } else if (promised[0].length > 1 && id == promised[2]) { // ETHEREUM
+                    // select an account which is not the default Account, and set it as the default account
+                    for (let i = 0; i < promised[0].length; i++) {
+                      let ethereumAccounts = promised[0].filter(account => account.currency == ETHEREUM)
+                      for (let i = 0; i < ethereumAccounts.length; i++) {
+                          if (ethereumAccounts[i]._id != id) {
+                              this.config.set(Config.CONFIG_KEY_DEFAULT_ETHEREUM_ACCOUNT, ethereumAccounts[i]._id);
+                              break;
+                          }
+                      }
                     }
                     resolve(this.repository.removeDocument(id));
                 } else {
@@ -103,9 +117,11 @@ export class AccountService {
         });
     }
 
-    getDefaultAccount() : Promise<Account> {
+    getDefaultAccount(crypto: string) : Promise<Account> {
         return new Promise<Account> ((resolve, reject) => {
-            this.config.get(Config.CONFIG_KEY_DEFAULT_ACCOUNT)
+            const configAccountPropertyForCrypto = "CONFIG_KEY_DEFAULT_" + crypto.toUpperCase() + "_ACCOUNT";
+console.log(configAccountPropertyForCrypto, Config[configAccountPropertyForCrypto])
+            this.config.get(Config[configAccountPropertyForCrypto])
                 .then(accountId => {
                     return this.getAccount(accountId);
                 }).then(account => {
@@ -115,19 +131,19 @@ export class AccountService {
                     return this.getAccounts()
                 }).then((accounts:any[]) => {
                     if (accounts && accounts.length > 0) {
-                        return this.config.set(Config.CONFIG_KEY_DEFAULT_ACCOUNT, accounts[0]._id);
+                        return this.config.set(Config[configAccountPropertyForCrypto], accounts[0]._id);
                     } else {
                         reject('no accounts available');
                     }
                 }).then(() => {
-                    resolve(this.getDefaultAccount());
+                    //resolve(this.getDefaultAccount(crypto));
                 });
         });
     }
 
-    getDefaultAddress() : Promise<string> {
+    getDefaultAddress(crypto: string) : Promise<string> {
         return new Promise<string> ((resolve, reject) => {
-            this.getDefaultAccount().then(account => {
+            this.getDefaultAccount(crypto).then(account => {
                     try {
                         resolve(this.getNextAddress(account));
                     } catch (e) {

@@ -17,7 +17,7 @@ export class InsightEthereumTransactionService implements TransactionService {
         return new Promise((resolve, reject) => {
             this.http.get(this.buildUrl(filter))
                 .subscribe(response => {
-                    resolve(this.parseTransactions(filter.addresses, response));
+                    resolve(this.parseTransactions(filter.addresses, response, filter.txid));
                 }, () => { reject(); });
         });
     }
@@ -37,7 +37,7 @@ export class InsightEthereumTransactionService implements TransactionService {
         return null;
     }
 
-    parseTransactions(addresses:string[], json:any) : Transaction[] {
+    parseTransactions(addresses:string[], json:any, txHash: string) : Transaction[] {
         let output = [];
         let items = [];
 
@@ -45,6 +45,10 @@ export class InsightEthereumTransactionService implements TransactionService {
             items = json.result;
         } else {
             items.push(json);
+        }
+
+        if (txHash) {
+          items = items.filter(item => item.hash == txHash)
         }
 
         for (let item of items) {
@@ -79,12 +83,7 @@ export class InsightEthereumTransactionService implements TransactionService {
 
         if (filter.addresses && filter.addresses.length > 0) {
             url = this.serviceUrl + "/api";
-
-            if (filter.txid) {
-                url += '/tx/' + filter.txid;
-            } else {
-                url += '?module=account&action=txlist&address=' + filter.addresses.join(',') + '&startblock=0&endblock=99999999&sort=asc&apikey=' + ETHERSCAN_API_KEY;
-            }
+            url += '?module=account&action=txlist&address=' + filter.addresses.join(',') + '&startblock=0&endblock=99999999&sort=asc&apikey=' + ETHERSCAN_API_KEY;
         }
 
         // TODO Use filters for perf

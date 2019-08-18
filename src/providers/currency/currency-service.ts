@@ -63,7 +63,8 @@ export class CurrencyService {
 
     getAvailableCurrencies() : Promise<any> {
         return new Promise<any>((resolve, reject) => {
-            resolve(this.getExchangeService().getAvailableCurrencies());
+          // The currencies are the same for ETH
+            resolve(this.getBitcoinExchangeService().getAvailableCurrencies());
         });
     }
 

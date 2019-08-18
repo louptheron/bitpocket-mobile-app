@@ -3,7 +3,7 @@
       <ion-buttons left>
           <button ion-button (click)="close()" class="bar-button-close"><ion-icon name="close"></ion-icon></button>
       </ion-buttons>
-      <ion-title>{{ 'TITLE.TRANSACTION' | translate }}</ion-title>     
+      <ion-title>{{ 'TITLE.TRANSACTION' | translate }}</ion-title>
   </ion-navbar>
 </ion-header>
 <ion-content>
@@ -19,7 +19,7 @@
       {{ 'LIST_HEADING.TRANSACTION' | translate }}
     </ion-list-header>
     <ion-item>{{ currencySymbol }} {{ transaction.amount | bitpocketUnit:'BTC':currencySymbol | bitpocketCurrency:currencySeparator:currencyThousandsPoint:currencyPrecision }}</ion-item>
-    <ion-item>{{ referenceCurrencySymbol }} {{ transaction.amount | bitpocketFiat:'BTC':referenceCurrencyRate | bitpocketCurrency:currencySeparator:currencyThousandsPoint }}</ion-item>
+    <ion-item>{{ referenceCurrencySymbol }} {{ transaction.amount | bitcoinFiat:'BTC':referenceCurrencyRate | bitpocketCurrency:currencySeparator:currencyThousandsPoint }}</ion-item>
     <ion-item>{{ (transaction.timestamp * 1000) | date:dateTimeFormat }}</ion-item>
     <ion-item>
       <ng-container *ngIf="transaction.confirmations < 6">
@@ -27,7 +27,7 @@
       </ng-container>
       <ng-container *ngIf="transaction.confirmations >= 6">
         <ion-icon item-start class="icon-confirmed" name="checkmark-circle"></ion-icon> {{ 'LIST_TEXT.CONFIRMED' | translate }}
-      </ng-container>      
+      </ng-container>
     </ion-item>
     <ion-item>
       <ng-container *ngIf="transaction.incomming">
@@ -37,5 +37,5 @@
         <ion-icon item-start name="ios-share-outline"></ion-icon> {{ 'LIST_TEXT.OUTOING' | translate }}
       </ng-container>
     </ion-item>
-  </ion-list>  
+  </ion-list>
 </ion-content>
