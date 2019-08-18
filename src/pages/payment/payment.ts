@@ -144,7 +144,7 @@ export class PaymentPage {
             }
 
             let qrOfficial:any = qrcode(0,'M');
-            qrOfficial.addData("ethereum:0x0ac10bf0342fa2724e93d250751186ba5b659303?amount=0.028606927918958&gas=21000");
+            qrOfficial.addData(qrCodeUri);
             qrOfficial.make();
 
             let qrUnofficial:any = null;
