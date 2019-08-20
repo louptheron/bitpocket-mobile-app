@@ -40,7 +40,7 @@
     "@ngx-translate/http-loader": "^2.0.0",
     "bip21": "^2.0.1",
     "bitcoinjs-lib": "^3.3.0",
-    "cordova-android": "6.4.0",
+    "cordova-android": "^8.0.0",
     "cordova-plugin-compat": "^1.2.0",
     "cordova-plugin-file": "^5.0.0",
     "cordova-plugin-file-opener2": "^2.0.19",

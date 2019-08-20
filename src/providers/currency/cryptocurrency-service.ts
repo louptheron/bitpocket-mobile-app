@@ -94,7 +94,7 @@ export class CryptocurrencyService {
                 return {
                     type : ETHEREUM_ADDRESS,
                     currency : ETHEREUM,
-                    data : input.match(ethereumRegexs[i])[0]
+                    data : input.match(ethereumRegexs[i])[0].toLowerCase()
                 };
             }
         }

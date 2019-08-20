@@ -76,11 +76,10 @@ export class PaymentResultPage {
             this.resultText = promised[2];
 
             if (this.resultSuccess) {
-                console.log(this.paymentRequest)
                 this.accountSyncService.storeTransaction({
                     _id       : this.paymentRequest.txid ,
                     amount    : this.paymentRequest.txAmount ,
-                    currency  : this.cryptocurrencyService.parseInput(this.account.data).currency ,
+                    currency  : this.cryptocurrencyService.parseInput(this.account.data).currency == ETHEREUM ? "ETH" : "BTC",
                     address   : this.paymentRequest.address ,
                     incomming : true ,
                     confirmations : 0 ,
@@ -97,7 +96,10 @@ export class PaymentResultPage {
     }
 
     showHistory() {
-        this.nav.setRoot('history', { accountId : this.account._id });
+        this.nav.setRoot('history', {
+          accountId : this.account._id,
+          type : this.account.type
+        }, );
     }
 
     constructor(
